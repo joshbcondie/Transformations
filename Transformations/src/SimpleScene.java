@@ -37,8 +37,11 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static String TITLE = "Transformations"; // window's title
 	private static final int CANVAS_WIDTH = 640; // width of the drawable
 	private static final int CANVAS_HEIGHT = 480; // height of the drawable
+
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
+	Texture carTexture = null;
+	Texture tireTexture = null;
 
 	private static Vertex3f cameraPosition = new Vertex3f(0, 0, 5);
 	private static Vertex3f cameraRotation = new Vertex3f(0, 0, 0);
@@ -116,13 +119,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 																// correction
 		gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out
 									// lighting
-		Texture texture = null;
 		try {
-			texture = TextureIO.newTexture(new File("car.jpg"), false);
+			carTexture = TextureIO.newTexture(new File("car.jpg"), false);
+			tireTexture = TextureIO.newTexture(new File("tire.jpg"), false);
 		} catch (GLException | IOException e) {
 			e.printStackTrace();
 		}
-		gl.glBindTexture(GL_TEXTURE_2D, texture.getTextureObject());
 		gl.glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -176,6 +178,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		if (cameraRight) {
 			cameraPosition.setX(cameraPosition.getX() + 0.1f);
 		}
+		if (cameraDown) {
+			cameraPosition.setZ(cameraPosition.getZ() + 0.1f);
+		}
+		if (cameraUp) {
+			cameraPosition.setZ(cameraPosition.getZ() - 0.1f);
+		}
 
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
 		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
@@ -185,11 +193,11 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 		gl.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
 				-cameraPosition.getZ());
-
+		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
 		carModel.render(gl);
 
-		gl.glTranslatef(10.0f, 0.0f, 0.0f);
-
+		gl.glTranslatef(1.0f, 0.0f, 0.0f);
+		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
 		tireModel.render(gl);
 	}
 
@@ -216,6 +224,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		case java.awt.event.KeyEvent.VK_RIGHT:
 			cameraRight = true;
 			break;
+		case java.awt.event.KeyEvent.VK_DOWN:
+			cameraDown = true;
+			break;
+		case java.awt.event.KeyEvent.VK_UP:
+			cameraUp = true;
+			break;
 		}
 	}
 
@@ -227,6 +241,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			break;
 		case java.awt.event.KeyEvent.VK_RIGHT:
 			cameraRight = false;
+			break;
+		case java.awt.event.KeyEvent.VK_DOWN:
+			cameraDown = false;
+			break;
+		case java.awt.event.KeyEvent.VK_UP:
+			cameraUp = false;
 			break;
 		}
 	}
