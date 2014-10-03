@@ -17,9 +17,6 @@ import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.KeyListener;
-import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -91,7 +88,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 				frame.pack();
 				frame.setVisible(true);
 
-				FPSAnimator animator = new FPSAnimator(canvas, 60);
+				new FPSAnimator(canvas, 60);
 				canvas.getAnimator().start();
 			}
 		});
@@ -231,8 +228,19 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
 		carModel.render(gl);
 
-		gl.glTranslatef(1.0f, 0.0f, 0.0f);
+		gl.glTranslatef(0.36f, 0.12f, -0.54f);
+		gl.glScalef(0.25f, 0.25f, 0.25f);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
+		tireModel.render(gl);
+
+		gl.glTranslatef(0, 0, 4.1f);
+		tireModel.render(gl);
+
+		gl.glTranslatef(-2.9f, 0, 0);
+		gl.glRotatef(180, 0, 1, 0);
+		tireModel.render(gl);
+
+		gl.glTranslatef(0, 0, 4.1f);
 		tireModel.render(gl);
 	}
 
