@@ -37,6 +37,8 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static String TITLE = "Transformations"; // window's title
 	private static final int CANVAS_WIDTH = 640; // width of the drawable
 	private static final int CANVAS_HEIGHT = 480; // height of the drawable
+	private static final float TRANSLATION_AMOUNT = 0.5f;
+	private static final float ROTATION_AMOUNT = 0.1f;
 
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
@@ -50,6 +52,11 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static boolean cameraRight = false;
 	private static boolean cameraUp = false;
 	private static boolean cameraDown = false;
+
+	private static boolean rotateLeft = false;
+	private static boolean rotateRight = false;
+	private static boolean rotateUp = false;
+	private static boolean rotateDown = false;
 
 	/** The entry main() method to setup the top-level container and animator */
 	public static void main(String[] args) {
@@ -173,16 +180,41 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	public void display(GLAutoDrawable drawable) {
 
 		if (cameraLeft) {
-			cameraPosition.setX(cameraPosition.getX() - 0.1f);
+			cameraPosition.setX(cameraPosition.getX() - ROTATION_AMOUNT
+					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
+			cameraPosition.setZ(cameraPosition.getZ() + ROTATION_AMOUNT
+					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
 		}
 		if (cameraRight) {
-			cameraPosition.setX(cameraPosition.getX() + 0.1f);
+			cameraPosition.setX(cameraPosition.getX() + ROTATION_AMOUNT
+					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
+			cameraPosition.setZ(cameraPosition.getZ() - ROTATION_AMOUNT
+					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
 		}
 		if (cameraDown) {
-			cameraPosition.setZ(cameraPosition.getZ() + 0.1f);
+			cameraPosition.setX(cameraPosition.getX() + ROTATION_AMOUNT
+					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
+			cameraPosition.setZ(cameraPosition.getZ() + ROTATION_AMOUNT
+					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
 		}
 		if (cameraUp) {
-			cameraPosition.setZ(cameraPosition.getZ() - 0.1f);
+			cameraPosition.setX(cameraPosition.getX() - ROTATION_AMOUNT
+					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
+			cameraPosition.setZ(cameraPosition.getZ() - ROTATION_AMOUNT
+					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
+		}
+
+		if (rotateLeft) {
+			cameraRotation.setY(cameraRotation.getY() + TRANSLATION_AMOUNT);
+		}
+		if (rotateRight) {
+			cameraRotation.setY(cameraRotation.getY() - TRANSLATION_AMOUNT);
+		}
+		if (rotateDown) {
+			cameraRotation.setX(cameraRotation.getX() - TRANSLATION_AMOUNT);
+		}
+		if (rotateUp) {
+			cameraRotation.setX(cameraRotation.getX() + TRANSLATION_AMOUNT);
 		}
 
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
@@ -191,8 +223,11 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 																// buffers
 		gl.glLoadIdentity(); // reset the model-view matrix
 
+		gl.glRotatef(-cameraRotation.getX(), 1, 0, 0);
+		gl.glRotatef(-cameraRotation.getY(), 0, 1, 0);
 		gl.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
 				-cameraPosition.getZ());
+
 		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
 		carModel.render(gl);
 
@@ -230,6 +265,18 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		case java.awt.event.KeyEvent.VK_UP:
 			cameraUp = true;
 			break;
+		case java.awt.event.KeyEvent.VK_A:
+			rotateLeft = true;
+			break;
+		case java.awt.event.KeyEvent.VK_D:
+			rotateRight = true;
+			break;
+		case java.awt.event.KeyEvent.VK_S:
+			rotateUp = true;
+			break;
+		case java.awt.event.KeyEvent.VK_W:
+			rotateDown = true;
+			break;
 		}
 	}
 
@@ -247,6 +294,18 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			break;
 		case java.awt.event.KeyEvent.VK_UP:
 			cameraUp = false;
+			break;
+		case java.awt.event.KeyEvent.VK_A:
+			rotateLeft = false;
+			break;
+		case java.awt.event.KeyEvent.VK_D:
+			rotateRight = false;
+			break;
+		case java.awt.event.KeyEvent.VK_S:
+			rotateUp = false;
+			break;
+		case java.awt.event.KeyEvent.VK_W:
+			rotateDown = false;
 			break;
 		}
 	}
