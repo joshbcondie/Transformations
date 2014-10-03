@@ -181,6 +181,42 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	@Override
 	public void display(GLAutoDrawable drawable) {
 
+		update();
+
+		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
+		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
+																// and depth
+																// buffers
+		gl.glLoadIdentity(); // reset the model-view matrix
+
+		gl.glRotatef(-cameraRotation.getX(), 1, 0, 0);
+		gl.glRotatef(-cameraRotation.getY(), 0, 1, 0);
+		gl.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
+				-cameraPosition.getZ());
+
+		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
+		carModel.render(gl);
+
+		gl.glTranslatef(0.36f, 0.12f, -0.54f);
+		gl.glScalef(0.25f, 0.25f, 0.25f);
+		gl.glRotatef(tireRotation, 0, 1, 0);
+		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
+		tireModel.render(gl);
+
+		gl.glRotatef(-tireRotation, 0, 1, 0);
+		gl.glTranslatef(0, 0, 4.1f);
+		tireModel.render(gl);
+
+		gl.glTranslatef(-2.9f, 0, 0);
+		gl.glRotatef(180, 0, 1, 0);
+		tireModel.render(gl);
+
+		gl.glTranslatef(0, 0, 4.1f);
+		gl.glRotatef(tireRotation, 0, 1, 0);
+		tireModel.render(gl);
+	}
+
+	private void update() {
 		if (cameraLeft) {
 			cameraPosition.setX(cameraPosition.getX()
 					- CAMERA_TRANSLATION_AMOUNT
@@ -233,38 +269,6 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		if (tireRight && tireRotation > -45) {
 			tireRotation -= TIRE_ROTATION_AMOUNT;
 		}
-
-		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
-		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
-																// and depth
-																// buffers
-		gl.glLoadIdentity(); // reset the model-view matrix
-
-		gl.glRotatef(-cameraRotation.getX(), 1, 0, 0);
-		gl.glRotatef(-cameraRotation.getY(), 0, 1, 0);
-		gl.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
-				-cameraPosition.getZ());
-
-		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
-		carModel.render(gl);
-
-		gl.glTranslatef(0.36f, 0.12f, -0.54f);
-		gl.glScalef(0.25f, 0.25f, 0.25f);
-		gl.glRotatef(tireRotation, 0, 1, 0);
-		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
-		tireModel.render(gl);
-
-		gl.glRotatef(-tireRotation, 0, 1, 0);
-		gl.glTranslatef(0, 0, 4.1f);
-		tireModel.render(gl);
-
-		gl.glTranslatef(-2.9f, 0, 0);
-		gl.glRotatef(180, 0, 1, 0);
-		tireModel.render(gl);
-
-		gl.glTranslatef(0, 0, 4.1f);
-		gl.glRotatef(tireRotation, 0, 1, 0);
-		tireModel.render(gl);
 	}
 
 	/**
