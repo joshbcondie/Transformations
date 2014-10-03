@@ -34,8 +34,9 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static String TITLE = "Transformations"; // window's title
 	private static final int CANVAS_WIDTH = 640; // width of the drawable
 	private static final int CANVAS_HEIGHT = 480; // height of the drawable
-	private static final float TRANSLATION_AMOUNT = 0.5f;
-	private static final float ROTATION_AMOUNT = 0.1f;
+	private static final float CAMERA_ROTATION_AMOUNT = 1f;
+	private static final float CAMERA_TRANSLATION_AMOUNT = 0.1f;
+	private static final float TIRE_ROTATION_AMOUNT = 1f;
 
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
@@ -44,6 +45,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 	private static Vertex3f cameraPosition = new Vertex3f(0, 0, 5);
 	private static Vertex3f cameraRotation = new Vertex3f(0, 0, 0);
+	private static float tireRotation = 0;
 
 	private static boolean cameraLeft = false;
 	private static boolean cameraRight = false;
@@ -54,6 +56,9 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static boolean rotateRight = false;
 	private static boolean rotateUp = false;
 	private static boolean rotateDown = false;
+
+	private static boolean tireLeft = false;
+	private static boolean tireRight = false;
 
 	/** The entry main() method to setup the top-level container and animator */
 	public static void main(String[] args) {
@@ -177,41 +182,56 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	public void display(GLAutoDrawable drawable) {
 
 		if (cameraLeft) {
-			cameraPosition.setX(cameraPosition.getX() - ROTATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX()
+					- CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
-			cameraPosition.setZ(cameraPosition.getZ() + ROTATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ()
+					+ CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
 		}
 		if (cameraRight) {
-			cameraPosition.setX(cameraPosition.getX() + ROTATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX()
+					+ CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
-			cameraPosition.setZ(cameraPosition.getZ() - ROTATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ()
+					- CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
 		}
 		if (cameraDown) {
-			cameraPosition.setX(cameraPosition.getX() + ROTATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX()
+					+ CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
-			cameraPosition.setZ(cameraPosition.getZ() + ROTATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ()
+					+ CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
 		}
 		if (cameraUp) {
-			cameraPosition.setX(cameraPosition.getX() - ROTATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX()
+					- CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
-			cameraPosition.setZ(cameraPosition.getZ() - ROTATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ()
+					- CAMERA_TRANSLATION_AMOUNT
 					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
 		}
 
 		if (rotateLeft) {
-			cameraRotation.setY(cameraRotation.getY() + TRANSLATION_AMOUNT);
+			cameraRotation.setY(cameraRotation.getY() + CAMERA_ROTATION_AMOUNT);
 		}
 		if (rotateRight) {
-			cameraRotation.setY(cameraRotation.getY() - TRANSLATION_AMOUNT);
+			cameraRotation.setY(cameraRotation.getY() - CAMERA_ROTATION_AMOUNT);
 		}
 		if (rotateDown) {
-			cameraRotation.setX(cameraRotation.getX() - TRANSLATION_AMOUNT);
+			cameraRotation.setX(cameraRotation.getX() - CAMERA_ROTATION_AMOUNT);
 		}
 		if (rotateUp) {
-			cameraRotation.setX(cameraRotation.getX() + TRANSLATION_AMOUNT);
+			cameraRotation.setX(cameraRotation.getX() + CAMERA_ROTATION_AMOUNT);
+		}
+
+		if (tireLeft && tireRotation < 45) {
+			tireRotation += TIRE_ROTATION_AMOUNT;
+		}
+		if (tireRight && tireRotation > -45) {
+			tireRotation -= TIRE_ROTATION_AMOUNT;
 		}
 
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
@@ -230,9 +250,11 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 		gl.glTranslatef(0.36f, 0.12f, -0.54f);
 		gl.glScalef(0.25f, 0.25f, 0.25f);
+		gl.glRotatef(tireRotation, 0, 1, 0);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
 		tireModel.render(gl);
 
+		gl.glRotatef(-tireRotation, 0, 1, 0);
 		gl.glTranslatef(0, 0, 4.1f);
 		tireModel.render(gl);
 
@@ -241,6 +263,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		tireModel.render(gl);
 
 		gl.glTranslatef(0, 0, 4.1f);
+		gl.glRotatef(tireRotation, 0, 1, 0);
 		tireModel.render(gl);
 	}
 
@@ -285,6 +308,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		case java.awt.event.KeyEvent.VK_W:
 			rotateDown = true;
 			break;
+		case java.awt.event.KeyEvent.VK_T:
+			tireLeft = true;
+			break;
+		case java.awt.event.KeyEvent.VK_Y:
+			tireRight = true;
+			break;
 		}
 	}
 
@@ -314,6 +343,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			break;
 		case java.awt.event.KeyEvent.VK_W:
 			rotateDown = false;
+			break;
+		case java.awt.event.KeyEvent.VK_T:
+			tireLeft = false;
+			break;
+		case java.awt.event.KeyEvent.VK_Y:
+			tireRight = false;
 			break;
 		}
 	}
