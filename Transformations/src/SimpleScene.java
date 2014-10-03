@@ -1,5 +1,6 @@
 import static javax.media.opengl.GL.*;
 import static javax.media.opengl.GL2ES1.*;
+
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -16,6 +17,10 @@ import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import com.jogamp.newt.event.KeyEvent;
+import com.jogamp.newt.event.KeyListener;
+import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
@@ -25,13 +30,23 @@ import com.jogamp.opengl.util.texture.TextureIO;
  * graphics.
  */
 @SuppressWarnings("serial")
-public class SimpleScene extends GLCanvas implements GLEventListener {
+public class SimpleScene extends GLCanvas implements GLEventListener,
+		java.awt.event.KeyListener {
+
 	// Define constants for the top-level container
-	private static String TITLE = "Texturing"; // window's title
+	private static String TITLE = "Transformations"; // window's title
 	private static final int CANVAS_WIDTH = 640; // width of the drawable
 	private static final int CANVAS_HEIGHT = 480; // height of the drawable
-	private static ObjModel crayonModel = null;
-	private static ObjModel boxModel = null;
+	private static ObjModel carModel = null;
+	private static ObjModel tireModel = null;
+
+	private static Vertex3f cameraPosition = new Vertex3f(0, 0, 5);
+	private static Vertex3f cameraRotation = new Vertex3f(0, 0, 0);
+
+	private static boolean cameraLeft = false;
+	private static boolean cameraRight = false;
+	private static boolean cameraUp = false;
+	private static boolean cameraDown = false;
 
 	/** The entry main() method to setup the top-level container and animator */
 	public static void main(String[] args) {
@@ -65,6 +80,9 @@ public class SimpleScene extends GLCanvas implements GLEventListener {
 				frame.setTitle(TITLE);
 				frame.pack();
 				frame.setVisible(true);
+
+				FPSAnimator animator = new FPSAnimator(canvas, 60);
+				canvas.getAnimator().start();
 			}
 		});
 	}
@@ -76,6 +94,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener {
 	/** Constructor to setup the GUI for this Component */
 	public SimpleScene() {
 		this.addGLEventListener(this);
+		this.addKeyListener(this);
 	}
 
 	// ------ Implement methods declared in GLEventListener ------
@@ -99,7 +118,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener {
 									// lighting
 		Texture texture = null;
 		try {
-			texture = TextureIO.newTexture(new File("boxandcrayon.jpg"), false);
+			texture = TextureIO.newTexture(new File("car.jpg"), false);
 		} catch (GLException | IOException e) {
 			e.printStackTrace();
 		}
@@ -111,8 +130,8 @@ public class SimpleScene extends GLCanvas implements GLEventListener {
 		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 		try {
-			crayonModel = new ObjModel(new File("Crayon.obj"));
-			boxModel = new ObjModel(new File("Box.obj"));
+			carModel = new ObjModel(new File("car.obj"));
+			tireModel = new ObjModel(new File("tire.obj"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -151,19 +170,27 @@ public class SimpleScene extends GLCanvas implements GLEventListener {
 	@Override
 	public void display(GLAutoDrawable drawable) {
 
+		if (cameraLeft) {
+			cameraPosition.setX(cameraPosition.getX() - 0.1f);
+		}
+		if (cameraRight) {
+			cameraPosition.setX(cameraPosition.getX() + 0.1f);
+		}
+
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
 		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
 																// and depth
 																// buffers
 		gl.glLoadIdentity(); // reset the model-view matrix
 
-		gl.glTranslatef(0.0f, -5.0f, -30.0f);
+		gl.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
+				-cameraPosition.getZ());
 
-		crayonModel.render(gl);
+		carModel.render(gl);
 
 		gl.glTranslatef(10.0f, 0.0f, 0.0f);
 
-		boxModel.render(gl);
+		tireModel.render(gl);
 	}
 
 	/**
@@ -172,5 +199,35 @@ public class SimpleScene extends GLCanvas implements GLEventListener {
 	 */
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
+	}
+
+	@Override
+	public void keyTyped(java.awt.event.KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyPressed(java.awt.event.KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case java.awt.event.KeyEvent.VK_LEFT:
+			cameraLeft = true;
+			break;
+		case java.awt.event.KeyEvent.VK_RIGHT:
+			cameraRight = true;
+			break;
+		}
+	}
+
+	@Override
+	public void keyReleased(java.awt.event.KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case java.awt.event.KeyEvent.VK_LEFT:
+			cameraLeft = false;
+			break;
+		case java.awt.event.KeyEvent.VK_RIGHT:
+			cameraRight = false;
+			break;
+		}
 	}
 }
