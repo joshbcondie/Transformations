@@ -40,10 +40,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
-	Texture carTexture = null;
-	Texture tireTexture = null;
+	private static ObjModel parkingLotModel = null;
+	private static Texture carTexture = null;
+	private static Texture tireTexture = null;
+	private static Texture parkingLotTexture = null;
 
-	private static Vertex3f cameraPosition = new Vertex3f(0, 0, 5);
+	private static Vertex3f cameraPosition = new Vertex3f(0, 1, 5);
 	private static Vertex3f cameraRotation = new Vertex3f(0, 0, 0);
 	private static float tireRotation = 0;
 
@@ -131,6 +133,8 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		try {
 			carTexture = TextureIO.newTexture(new File("car.jpg"), false);
 			tireTexture = TextureIO.newTexture(new File("tire.jpg"), false);
+			parkingLotTexture = TextureIO.newTexture(
+					new File("ParkingLot.jpg"), false);
 		} catch (GLException | IOException e) {
 			e.printStackTrace();
 		}
@@ -143,6 +147,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		try {
 			carModel = new ObjModel(new File("car.obj"));
 			tireModel = new ObjModel(new File("tire.obj"));
+			parkingLotModel = new ObjModel(new File("ParkingLot.obj"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -194,6 +199,11 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		gl.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
 				-cameraPosition.getZ());
 
+		gl.glBindTexture(GL_TEXTURE_2D, parkingLotTexture.getTextureObject());
+		parkingLotModel.render(gl);
+
+		gl.glTranslatef(-2.5f, 0.1f, -7.5f);
+		gl.glRotatef(55, 0, 1, 0);
 		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
 		carModel.render(gl);
 
