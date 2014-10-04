@@ -41,6 +41,8 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
 	private static ObjModel parkingLotModel = null;
+	private static ObjModel penguinModel = null;
+
 	private static Texture carTexture = null;
 	private static Texture tireTexture = null;
 	private static Texture parkingLotTexture = null;
@@ -148,6 +150,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			carModel = new ObjModel(new File("car.obj"));
 			tireModel = new ObjModel(new File("tire.obj"));
 			parkingLotModel = new ObjModel(new File("ParkingLot.obj"));
+			penguinModel = new ObjModel(new File("Penguin.obj"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -206,6 +209,13 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		gl.glRotatef(55, 0, 1, 0);
 		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
 		carModel.render(gl);
+
+		gl.glTranslatef(0, 0.9f, 0);
+		gl.glScalef(0.1f, 0.1f, 0.1f);
+		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
+		penguinModel.render(gl);
+		gl.glScalef(10f, 10f, 10f);
+		gl.glTranslatef(0, -0.9f, 0);
 
 		gl.glTranslatef(0.36f, 0.12f, -0.54f);
 		gl.glScalef(0.25f, 0.25f, 0.25f);
