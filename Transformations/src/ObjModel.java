@@ -94,8 +94,8 @@ public class ObjModel {
 				}
 				int vertexIndex = face.getVertices().get(i);
 				Vector3f vertex = vertices.get(vertexIndex - 1);
-				Vector3f transformed = Matrix.multiply(matrix,
-						new Matrix(vertex)).toVector3f();
+				Vector3f transformed = matrix.multiply(new Matrix(vertex))
+						.toVector3f();
 				gl.glVertex3f(transformed.getX(), transformed.getY(),
 						transformed.getZ());
 			}

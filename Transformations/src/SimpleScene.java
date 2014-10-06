@@ -191,49 +191,49 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 		update();
 
-		Matrix matrix = new Matrix();
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
 		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
 																// and depth
 																// buffers
-		matrix.glLoadIdentity(); // reset the model-view matrix
+		Matrix matrix = new Matrix(4, 4);
+		matrix.loadIdentity(); // reset the model-view matrix
 
-		matrix.glRotateX(-cameraRotation.getX());
-		matrix.glRotateY(-cameraRotation.getY());
-		matrix.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
+		matrix.rotateX(-cameraRotation.getX());
+		matrix.rotateY(-cameraRotation.getY());
+		matrix.translate(-cameraPosition.getX(), -cameraPosition.getY(),
 				-cameraPosition.getZ());
 
 		gl.glBindTexture(GL_TEXTURE_2D, parkingLotTexture.getTextureObject());
 		parkingLotModel.render(gl, matrix);
 
-		matrix.glTranslatef(-2.5f, 0.1f, -7.5f);
-		matrix.glRotateY((float) (55 * Math.PI / 180));
+		matrix.translate(-2.5f, 0.1f, -7.5f);
+		matrix.rotateY((float) (55 * Math.PI / 180));
 		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
 		carModel.render(gl, matrix);
 
-		matrix.glTranslatef(0, 0.9f, 0);
-		matrix.glScalef(0.1f, 0.1f, 0.1f);
+		matrix.translate(0, 0.9f, 0);
+		matrix.scale(0.1f, 0.1f, 0.1f);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
 		penguinModel.render(gl, matrix);
-		matrix.glScalef(10f, 10f, 10f);
-		matrix.glTranslatef(0, -0.9f, 0);
+		matrix.scale(10f, 10f, 10f);
+		matrix.translate(0, -0.9f, 0);
 
-		matrix.glTranslatef(0.36f, 0.12f, -0.54f);
-		matrix.glScalef(0.25f, 0.25f, 0.25f);
-		matrix.glRotateY(tireRotation);
+		matrix.translate(0.36f, 0.12f, -0.54f);
+		matrix.scale(0.25f, 0.25f, 0.25f);
+		matrix.rotateY(tireRotation);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
 		tireModel.render(gl, matrix);
 
-		matrix.glRotateY(-tireRotation);
-		matrix.glTranslatef(0, 0, 4.1f);
+		matrix.rotateY(-tireRotation);
+		matrix.translate(0, 0, 4.1f);
 		tireModel.render(gl, matrix);
 
-		matrix.glTranslatef(-2.9f, 0, 0);
-		matrix.glRotateY((float) Math.PI);
+		matrix.translate(-2.9f, 0, 0);
+		matrix.rotateY((float) Math.PI);
 		tireModel.render(gl, matrix);
 
-		matrix.glTranslatef(0, 0, 4.1f);
-		matrix.glRotateY(tireRotation);
+		matrix.translate(0, 0, 4.1f);
+		matrix.rotateY(tireRotation);
 		tireModel.render(gl, matrix);
 	}
 
