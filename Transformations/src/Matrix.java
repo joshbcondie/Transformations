@@ -4,9 +4,9 @@ public class Matrix {
 
 	public static Matrix multiply(Matrix a, Matrix b) {
 		Matrix result = new Matrix();
-		result.values = new float[b.values.length][b.values.length];
+		result.values = new float[b.values.length][a.values[0].length];
 		for (int i = 0; i < b.values.length; i++) {
-			for (int j = 0; j < b.values.length; j++) {
+			for (int j = 0; j < a.values[0].length; j++) {
 				float sum = 0;
 				for (int k = 0; k < a.values.length; k++) {
 					sum += a.values[k][j] * b.values[i][k];
@@ -38,7 +38,7 @@ public class Matrix {
 		translation.values[3][0] = x;
 		translation.values[3][1] = y;
 		translation.values[3][2] = z;
-		values = Matrix.multiply(translation, this).values;
+		values = Matrix.multiply(this, translation).values;
 	}
 
 	public void glScalef(float x, float y, float z) {
@@ -47,27 +47,27 @@ public class Matrix {
 		scale.values[0][0] = x;
 		scale.values[1][1] = y;
 		scale.values[2][2] = z;
-		values = Matrix.multiply(scale, this).values;
+		values = Matrix.multiply(this, scale).values;
 	}
 
-	public void glRotateX(float degrees) {
+	public void glRotateX(float radians) {
 		Matrix rotation = new Matrix();
 		rotation.glLoadIdentity();
-		rotation.values[1][1] = (float) Math.cos(degrees);
-		rotation.values[2][1] = -(float) Math.sin(degrees);
-		rotation.values[1][2] = (float) Math.sin(degrees);
-		rotation.values[2][2] = (float) Math.cos(degrees);
-		values = Matrix.multiply(rotation, this).values;
+		rotation.values[1][1] = (float) Math.cos(radians);
+		rotation.values[2][1] = -(float) Math.sin(radians);
+		rotation.values[1][2] = (float) Math.sin(radians);
+		rotation.values[2][2] = (float) Math.cos(radians);
+		values = Matrix.multiply(this, rotation).values;
 	}
 
-	public void glRotateY(float degrees) {
+	public void glRotateY(float radians) {
 		Matrix rotation = new Matrix();
 		rotation.glLoadIdentity();
-		rotation.values[0][0] = (float) Math.cos(degrees);
-		rotation.values[2][0] = (float) Math.sin(degrees);
-		rotation.values[0][2] = -(float) Math.sin(degrees);
-		rotation.values[2][2] = (float) Math.cos(degrees);
-		values = Matrix.multiply(rotation, this).values;
+		rotation.values[0][0] = (float) Math.cos(radians);
+		rotation.values[2][0] = (float) Math.sin(radians);
+		rotation.values[0][2] = -(float) Math.sin(radians);
+		rotation.values[2][2] = (float) Math.cos(radians);
+		values = Matrix.multiply(this, rotation).values;
 	}
 
 	public Vector3f toVector3f() {

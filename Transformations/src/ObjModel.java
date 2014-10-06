@@ -74,7 +74,7 @@ public class ObjModel {
 	 * @param gl
 	 *            the instance to which the model will be rendered.
 	 */
-	public void render(GL2 gl) {
+	public void render(GL2 gl, Matrix matrix) {
 		for (Face face : faces) {
 			gl.glEnable(GL_TEXTURE_2D);
 			if (face.getVertices().size() == 3) {
@@ -94,7 +94,10 @@ public class ObjModel {
 				}
 				int vertexIndex = face.getVertices().get(i);
 				Vector3f vertex = vertices.get(vertexIndex - 1);
-				gl.glVertex3f(vertex.getX(), vertex.getY(), vertex.getZ());
+				Vector3f transformed = Matrix.multiply(matrix,
+						new Matrix(vertex)).toVector3f();
+				gl.glVertex3f(transformed.getX(), transformed.getY(),
+						transformed.getZ());
 			}
 
 			gl.glEnd();

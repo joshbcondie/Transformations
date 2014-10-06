@@ -34,9 +34,9 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static String TITLE = "Transformations"; // window's title
 	private static final int CANVAS_WIDTH = 640; // width of the drawable
 	private static final int CANVAS_HEIGHT = 480; // height of the drawable
-	private static final float CAMERA_ROTATION_AMOUNT = 1f;
+	private static final float CAMERA_ROTATION_AMOUNT = 0.02f;
 	private static final float CAMERA_TRANSLATION_AMOUNT = 0.1f;
-	private static final float TIRE_ROTATION_AMOUNT = 1f;
+	private static final float TIRE_ROTATION_AMOUNT = 0.05f;
 
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
@@ -191,84 +191,84 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 		update();
 
-//		Matrix matrix = new Matrix();
+		Matrix matrix = new Matrix();
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
 		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
 																// and depth
 																// buffers
-		gl.glLoadIdentity(); // reset the model-view matrix
+		matrix.glLoadIdentity(); // reset the model-view matrix
 
-		gl.glRotatef(-cameraRotation.getX(), 1, 0, 0);
-		gl.glRotatef(-cameraRotation.getY(), 0, 1, 0);
-		gl.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
+		matrix.glRotateX(-cameraRotation.getX());
+		matrix.glRotateY(-cameraRotation.getY());
+		matrix.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(),
 				-cameraPosition.getZ());
 
 		gl.glBindTexture(GL_TEXTURE_2D, parkingLotTexture.getTextureObject());
-		parkingLotModel.render(gl);
+		parkingLotModel.render(gl, matrix);
 
-		gl.glTranslatef(-2.5f, 0.1f, -7.5f);
-		gl.glRotatef(55, 0, 1, 0);
+		matrix.glTranslatef(-2.5f, 0.1f, -7.5f);
+		matrix.glRotateY((float) (55 * Math.PI / 180));
 		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
-		carModel.render(gl);
+		carModel.render(gl, matrix);
 
-		gl.glTranslatef(0, 0.9f, 0);
-		gl.glScalef(0.1f, 0.1f, 0.1f);
+		matrix.glTranslatef(0, 0.9f, 0);
+		matrix.glScalef(0.1f, 0.1f, 0.1f);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
-		penguinModel.render(gl);
-		gl.glScalef(10f, 10f, 10f);
-		gl.glTranslatef(0, -0.9f, 0);
+		penguinModel.render(gl, matrix);
+		matrix.glScalef(10f, 10f, 10f);
+		matrix.glTranslatef(0, -0.9f, 0);
 
-		gl.glTranslatef(0.36f, 0.12f, -0.54f);
-		gl.glScalef(0.25f, 0.25f, 0.25f);
-		gl.glRotatef(tireRotation, 0, 1, 0);
+		matrix.glTranslatef(0.36f, 0.12f, -0.54f);
+		matrix.glScalef(0.25f, 0.25f, 0.25f);
+		matrix.glRotateY(tireRotation);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
-		tireModel.render(gl);
+		tireModel.render(gl, matrix);
 
-		gl.glRotatef(-tireRotation, 0, 1, 0);
-		gl.glTranslatef(0, 0, 4.1f);
-		tireModel.render(gl);
+		matrix.glRotateY(-tireRotation);
+		matrix.glTranslatef(0, 0, 4.1f);
+		tireModel.render(gl, matrix);
 
-		gl.glTranslatef(-2.9f, 0, 0);
-		gl.glRotatef(180, 0, 1, 0);
-		tireModel.render(gl);
+		matrix.glTranslatef(-2.9f, 0, 0);
+		matrix.glRotateY((float) Math.PI);
+		tireModel.render(gl, matrix);
 
-		gl.glTranslatef(0, 0, 4.1f);
-		gl.glRotatef(tireRotation, 0, 1, 0);
-		tireModel.render(gl);
+		matrix.glTranslatef(0, 0, 4.1f);
+		matrix.glRotateY(tireRotation);
+		tireModel.render(gl, matrix);
 	}
 
 	private void update() {
 		if (cameraLeft) {
 			cameraPosition.setX(cameraPosition.getX()
 					- CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.cos(cameraRotation.getY()));
 			cameraPosition.setZ(cameraPosition.getZ()
 					+ CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.sin(cameraRotation.getY()));
 		}
 		if (cameraRight) {
 			cameraPosition.setX(cameraPosition.getX()
 					+ CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.cos(cameraRotation.getY()));
 			cameraPosition.setZ(cameraPosition.getZ()
 					- CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.sin(cameraRotation.getY()));
 		}
 		if (cameraDown) {
 			cameraPosition.setX(cameraPosition.getX()
 					+ CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.sin(cameraRotation.getY()));
 			cameraPosition.setZ(cameraPosition.getZ()
 					+ CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.cos(cameraRotation.getY()));
 		}
 		if (cameraUp) {
 			cameraPosition.setX(cameraPosition.getX()
 					- CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.sin(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.sin(cameraRotation.getY()));
 			cameraPosition.setZ(cameraPosition.getZ()
 					- CAMERA_TRANSLATION_AMOUNT
-					* (float) Math.cos(cameraRotation.getY() * Math.PI / 180));
+					* (float) Math.cos(cameraRotation.getY()));
 		}
 
 		if (rotateLeft) {
@@ -284,10 +284,10 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			cameraRotation.setX(cameraRotation.getX() + CAMERA_ROTATION_AMOUNT);
 		}
 
-		if (tireLeft && tireRotation < 45) {
+		if (tireLeft && tireRotation < Math.PI / 4) {
 			tireRotation += TIRE_ROTATION_AMOUNT;
 		}
-		if (tireRight && tireRotation > -45) {
+		if (tireRight && tireRotation > -Math.PI / 4) {
 			tireRotation -= TIRE_ROTATION_AMOUNT;
 		}
 	}
