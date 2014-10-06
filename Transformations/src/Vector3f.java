@@ -1,16 +1,16 @@
-public class Vertex3f {
+public class Vector3f {
 
 	private float x;
 	private float y;
 	private float z;
 
-	public Vertex3f(float x, float y, float z) {
+	public Vector3f(float x, float y, float z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
-	public Vertex3f(float x, float y) {
+	public Vector3f(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}

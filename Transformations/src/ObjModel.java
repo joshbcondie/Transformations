@@ -17,8 +17,8 @@ import javax.media.opengl.GL2;
  */
 public class ObjModel {
 
-	private List<Vertex3f> vertices;
-	private List<Vertex3f> textureCoordinates;
+	private List<Vector3f> vertices;
+	private List<Vector3f> textureCoordinates;
 	private List<Face> faces;
 
 	/**
@@ -43,11 +43,11 @@ public class ObjModel {
 				float x = Float.parseFloat(line[1]);
 				float y = Float.parseFloat(line[2]);
 				float z = Float.parseFloat(line[3]);
-				vertices.add(new Vertex3f(x, y, z));
+				vertices.add(new Vector3f(x, y, z));
 			} else if (line[0].equals("vt")) {
 				float x = Float.parseFloat(line[1]);
 				float y = Float.parseFloat(line[2]);
-				textureCoordinates.add(new Vertex3f(x, y));
+				textureCoordinates.add(new Vector3f(x, y));
 			} else if (line[0].equals("f")) {
 				Face face = new Face();
 				for (int i = 1; i < line.length; i++) {
@@ -87,13 +87,13 @@ public class ObjModel {
 
 			for (int i = 0; i < face.getVertices().size(); i++) {
 				if (textureCoordinates.size() > i) {
-					Vertex3f textureCoordinate = textureCoordinates.get(face
+					Vector3f textureCoordinate = textureCoordinates.get(face
 							.getTextureCoordinates().get(i) - 1);
 					gl.glTexCoord2f(textureCoordinate.getX(),
 							textureCoordinate.getY());
 				}
 				int vertexIndex = face.getVertices().get(i);
-				Vertex3f vertex = vertices.get(vertexIndex - 1);
+				Vector3f vertex = vertices.get(vertexIndex - 1);
 				gl.glVertex3f(vertex.getX(), vertex.getY(), vertex.getZ());
 			}
 

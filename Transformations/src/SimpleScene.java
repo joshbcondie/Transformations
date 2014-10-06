@@ -47,8 +47,8 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static Texture tireTexture = null;
 	private static Texture parkingLotTexture = null;
 
-	private static Vertex3f cameraPosition = new Vertex3f(0, 1, 5);
-	private static Vertex3f cameraRotation = new Vertex3f(0, 0, 0);
+	private static Vector3f cameraPosition = new Vector3f(0, 1, 5);
+	private static Vector3f cameraRotation = new Vector3f(0, 0, 0);
 	private static float tireRotation = 0;
 
 	private static boolean cameraLeft = false;
@@ -191,6 +191,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 		update();
 
+//		Matrix matrix = new Matrix();
 		GL2 gl = drawable.getGL().getGL2(); // get the OpenGL 2 graphics context
 		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
 																// and depth
