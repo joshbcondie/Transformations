@@ -2,6 +2,7 @@ import static javax.media.opengl.GL.*;
 import static javax.media.opengl.GL2ES1.*;
 
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -35,8 +36,9 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static final int CANVAS_WIDTH = 640; // width of the drawable
 	private static final int CANVAS_HEIGHT = 480; // height of the drawable
 	private static final float CAMERA_ROTATION_AMOUNT = 0.02f;
-	private static final float CAMERA_TRANSLATION_AMOUNT = 0.1f;
+	private static final float CAMERA_SPEED = 0.1f;
 	private static final float TIRE_ROTATION_AMOUNT = 0.05f;
+	private static final float CAR_SPEED = 0.05f;
 
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
@@ -49,7 +51,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 	private static Vector3f cameraPosition = new Vector3f(0, 1, 5);
 	private static Vector3f cameraRotation = new Vector3f(0, 0, 0);
-	private static float tireRotation = 0;
+	private static float tireRotation = 0.001f;
+
+	private static Vector3f carPosition = new Vector3f(-2.5f, 0.1f, -7.5f);
+	private static float carRotation = (float) (55 * Math.PI / 180);
+	// private static Vector3f carPosition = new Vector3f(0, 0, 0);
+	// private static float carRotation = 0;
 
 	private static boolean cameraLeft = false;
 	private static boolean cameraRight = false;
@@ -63,6 +70,9 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 	private static boolean tireLeft = false;
 	private static boolean tireRight = false;
+
+	private static boolean carForward = false;
+	private static boolean carBackward = false;
 
 	/** The entry main() method to setup the top-level container and animator */
 	public static void main(String[] args) {
@@ -195,79 +205,73 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color
 																// and depth
 																// buffers
-		Matrix matrix = new Matrix(4, 4);
-		matrix.loadIdentity(); // reset the model-view matrix
+		Matrix viewMatrix = new Matrix(4, 4);
+		viewMatrix.loadIdentity(); // reset the model-view matrix
 
-		matrix.rotateX(-cameraRotation.getX());
-		matrix.rotateY(-cameraRotation.getY());
-		matrix.translate(-cameraPosition.getX(), -cameraPosition.getY(),
+		viewMatrix.rotateX(-cameraRotation.getX());
+		viewMatrix.rotateY(-cameraRotation.getY());
+		viewMatrix.translate(-cameraPosition.getX(), -cameraPosition.getY(),
 				-cameraPosition.getZ());
 
 		gl.glBindTexture(GL_TEXTURE_2D, parkingLotTexture.getTextureObject());
-		parkingLotModel.render(gl, matrix);
+		parkingLotModel.render(gl, viewMatrix);
 
-		matrix.translate(-2.5f, 0.1f, -7.5f);
-		matrix.rotateY((float) (55 * Math.PI / 180));
+		viewMatrix.translate(carPosition.getX(), carPosition.getY(),
+				carPosition.getZ());
+		viewMatrix.rotateY(carRotation);
 		gl.glBindTexture(GL_TEXTURE_2D, carTexture.getTextureObject());
-		carModel.render(gl, matrix);
+		carModel.render(gl, viewMatrix);
 
-		matrix.translate(0, 0.9f, 0);
-		matrix.scale(0.1f, 0.1f, 0.1f);
+		viewMatrix.translate(0, 0.9f, 0);
+		viewMatrix.scale(0.1f, 0.1f, 0.1f);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
-		penguinModel.render(gl, matrix);
-		matrix.scale(10f, 10f, 10f);
-		matrix.translate(0, -0.9f, 0);
+		penguinModel.render(gl, viewMatrix);
+		viewMatrix.scale(10f, 10f, 10f);
+		viewMatrix.translate(0, -0.9f, 0);
 
-		matrix.translate(0.36f, 0.12f, -0.54f);
-		matrix.scale(0.25f, 0.25f, 0.25f);
-		matrix.rotateY(tireRotation);
+		viewMatrix.translate(0.36f, 0.12f, -0.54f);
+		viewMatrix.scale(0.25f, 0.25f, 0.25f);
+		viewMatrix.rotateY(tireRotation);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
-		tireModel.render(gl, matrix);
+		tireModel.render(gl, viewMatrix);
 
-		matrix.rotateY(-tireRotation);
-		matrix.translate(0, 0, 4.1f);
-		tireModel.render(gl, matrix);
+		viewMatrix.rotateY(-tireRotation);
+		viewMatrix.translate(0, 0, 4.1f);
+		tireModel.render(gl, viewMatrix);
 
-		matrix.translate(-2.9f, 0, 0);
-		matrix.rotateY((float) Math.PI);
-		tireModel.render(gl, matrix);
+		viewMatrix.translate(-2.9f, 0, 0);
+		viewMatrix.rotateY((float) Math.PI);
+		tireModel.render(gl, viewMatrix);
 
-		matrix.translate(0, 0, 4.1f);
-		matrix.rotateY(tireRotation);
-		tireModel.render(gl, matrix);
+		viewMatrix.translate(0, 0, 4.1f);
+		viewMatrix.rotateY(tireRotation);
+		tireModel.render(gl, viewMatrix);
 	}
 
 	private void update() {
+
 		if (cameraLeft) {
-			cameraPosition.setX(cameraPosition.getX()
-					- CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX() - CAMERA_SPEED
 					* (float) Math.cos(cameraRotation.getY()));
-			cameraPosition.setZ(cameraPosition.getZ()
-					+ CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ() + CAMERA_SPEED
 					* (float) Math.sin(cameraRotation.getY()));
 		}
 		if (cameraRight) {
-			cameraPosition.setX(cameraPosition.getX()
-					+ CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX() + CAMERA_SPEED
 					* (float) Math.cos(cameraRotation.getY()));
-			cameraPosition.setZ(cameraPosition.getZ()
-					- CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ() - CAMERA_SPEED
 					* (float) Math.sin(cameraRotation.getY()));
 		}
 		if (cameraDown) {
-			cameraPosition.setX(cameraPosition.getX()
-					+ CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX() + CAMERA_SPEED
 					* (float) Math.sin(cameraRotation.getY()));
-			cameraPosition.setZ(cameraPosition.getZ()
-					+ CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ() + CAMERA_SPEED
 					* (float) Math.cos(cameraRotation.getY()));
 		}
 		if (cameraUp) {
-			cameraPosition.setX(cameraPosition.getX()
-					- CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setX(cameraPosition.getX() - CAMERA_SPEED
 					* (float) Math.sin(cameraRotation.getY()));
-			cameraPosition.setZ(cameraPosition.getZ()
-					- CAMERA_TRANSLATION_AMOUNT
+			cameraPosition.setZ(cameraPosition.getZ() - CAMERA_SPEED
 					* (float) Math.cos(cameraRotation.getY()));
 		}
 
@@ -289,6 +293,33 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		}
 		if (tireRight && tireRotation > -Math.PI / 4) {
 			tireRotation -= TIRE_ROTATION_AMOUNT;
+		}
+
+		if (carForward) {
+
+			float z = 3.56f;
+			float x = 1000;
+			x = (float) -(4.64 / Math.tan(tireRotation));
+
+			Matrix carTransformation = new Matrix(4, 4);
+			carTransformation.loadIdentity();
+
+			carTransformation.translate(carPosition.getX(), carPosition.getY(),
+					carPosition.getZ());
+			carTransformation.rotateY(carRotation);
+
+			carTransformation.translate(x, 0, z);
+			carTransformation.rotateY(tireRotation * CAR_SPEED);
+			carTransformation.translate(-x, 0, -z);
+
+			carTransformation.rotateY(-carRotation);
+			carTransformation.translate(-carPosition.getX(),
+					-carPosition.getY(), -carPosition.getZ());
+
+			carPosition = carTransformation.multiply(new Matrix(carPosition))
+					.toVector3f();
+			carRotation += tireRotation * CAR_SPEED;
+			tireRotation -= tireRotation * CAR_SPEED;
 		}
 	}
 
@@ -339,6 +370,14 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		case java.awt.event.KeyEvent.VK_Y:
 			tireRight = true;
 			break;
+		case java.awt.event.KeyEvent.VK_SPACE:
+			carForward = true;
+			break;
+		case java.awt.event.KeyEvent.VK_B:
+			carBackward = true;
+			break;
+		case java.awt.event.KeyEvent.VK_C:
+			carRotation += 0.1f;
 		}
 	}
 
@@ -374,6 +413,12 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			break;
 		case java.awt.event.KeyEvent.VK_Y:
 			tireRight = false;
+			break;
+		case java.awt.event.KeyEvent.VK_SPACE:
+			carForward = false;
+			break;
+		case java.awt.event.KeyEvent.VK_B:
+			carBackward = false;
 			break;
 		}
 	}
