@@ -39,6 +39,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 	private static final float CAMERA_SPEED = 0.1f;
 	private static final float TIRE_ROTATION_AMOUNT = 0.05f;
 	private static final float CAR_SPEED = 0.05f;
+	private static final float BACKWARD_SPEED = 0.005f;
 
 	private static ObjModel carModel = null;
 	private static ObjModel tireModel = null;
@@ -51,7 +52,8 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 	private static Vector3f cameraPosition = new Vector3f(0, 1, 5);
 	private static Vector3f cameraRotation = new Vector3f(0, 0, 0);
-	private static float tireRotation = 0.001f;
+	private static float tireOrientation = 0.001f;
+	private static float tireRotation = 0;
 
 	private static Vector3f carPosition = new Vector3f(-2.5f, 0.1f, -7.5f);
 	private static float carRotation = (float) (55 * Math.PI / 180);
@@ -231,20 +233,27 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 		viewMatrix.translate(0.36f, 0.12f, -0.54f);
 		viewMatrix.scale(0.25f, 0.25f, 0.25f);
-		viewMatrix.rotateY(tireRotation);
+		viewMatrix.rotateY(tireOrientation);
+		viewMatrix.rotateX(tireRotation);
 		gl.glBindTexture(GL_TEXTURE_2D, tireTexture.getTextureObject());
 		tireModel.render(gl, viewMatrix);
+		viewMatrix.rotateX(-tireRotation);
+		viewMatrix.rotateY(-tireOrientation);
 
-		viewMatrix.rotateY(-tireRotation);
 		viewMatrix.translate(0, 0, 4.1f);
+		viewMatrix.rotateX(tireRotation);
 		tireModel.render(gl, viewMatrix);
+		viewMatrix.rotateX(-tireRotation);
 
 		viewMatrix.translate(-2.9f, 0, 0);
 		viewMatrix.rotateY((float) Math.PI);
+		viewMatrix.rotateX(-tireRotation);
 		tireModel.render(gl, viewMatrix);
+		viewMatrix.rotateX(tireRotation);
 
 		viewMatrix.translate(0, 0, 4.1f);
-		viewMatrix.rotateY(tireRotation);
+		viewMatrix.rotateY(tireOrientation);
+		viewMatrix.rotateX(-tireRotation);
 		tireModel.render(gl, viewMatrix);
 	}
 
@@ -288,11 +297,11 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			cameraRotation.setX(cameraRotation.getX() + CAMERA_ROTATION_AMOUNT);
 		}
 
-		if (tireLeft && tireRotation < Math.PI / 4) {
-			tireRotation += TIRE_ROTATION_AMOUNT;
+		if (tireLeft && tireOrientation < Math.PI / 4) {
+			tireOrientation += TIRE_ROTATION_AMOUNT;
 		}
-		if (tireRight && tireRotation > -Math.PI / 4) {
-			tireRotation -= TIRE_ROTATION_AMOUNT;
+		if (tireRight && tireOrientation > -Math.PI / 4) {
+			tireOrientation -= TIRE_ROTATION_AMOUNT;
 		}
 
 		if (carForward) {
@@ -300,7 +309,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			// Form a triangle to find out which point to rotate about
 			float z = 3.56f;
 			float x = 1000;
-			x = (float) -(4.64 / Math.tan(tireRotation));
+			x = (float) -(4.64 / Math.tan(tireOrientation));
 
 			Matrix carTransformation = new Matrix(4, 4);
 			carTransformation.loadIdentity();
@@ -312,7 +321,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 			// Rotate around the point
 			carTransformation.translate(x, 0, z);
-			carTransformation.rotateY(tireRotation * CAR_SPEED);
+			carTransformation.rotateY(tireOrientation * CAR_SPEED);
 			carTransformation.translate(-x, 0, -z);
 
 			// Undo transformations
@@ -323,8 +332,48 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			// Move car
 			carPosition = carTransformation.multiply(new Matrix(carPosition))
 					.toVector3f();
-			carRotation += tireRotation * CAR_SPEED;
-			tireRotation -= tireRotation * CAR_SPEED;
+			carRotation += tireOrientation * CAR_SPEED;
+			tireOrientation -= tireOrientation * CAR_SPEED;
+
+			// Rotate tire
+			tireRotation -= CAR_SPEED;
+		}
+
+		if (carBackward) {
+
+			// Form a triangle to find out which point to rotate about
+			float z = 3.56f;
+			float x = 1000;
+			x = (float) -(4.64 / Math.tan(tireOrientation));
+
+			Matrix carTransformation = new Matrix(4, 4);
+			carTransformation.loadIdentity();
+
+			// Put car in the origin
+			carTransformation.translate(carPosition.getX(), carPosition.getY(),
+					carPosition.getZ());
+			carTransformation.rotateY(carRotation);
+
+			// Rotate around the point
+			carTransformation.translate(x, 0, z);
+			carTransformation.rotateY(-tireOrientation * BACKWARD_SPEED);
+			carTransformation.translate(-x, 0, -z);
+
+			// Undo transformations
+			carTransformation.rotateY(-carRotation);
+			carTransformation.translate(-carPosition.getX(),
+					-carPosition.getY(), -carPosition.getZ());
+
+			// Move car
+			carPosition = carTransformation.multiply(new Matrix(carPosition))
+					.toVector3f();
+			carRotation -= tireOrientation * BACKWARD_SPEED;
+			if (tireOrientation + tireOrientation * BACKWARD_SPEED < Math.PI / 4
+					&& tireOrientation + tireOrientation * BACKWARD_SPEED > -Math.PI / 4)
+				tireOrientation += tireOrientation * BACKWARD_SPEED;
+
+			// Rotate tire
+			tireRotation += CAR_SPEED;
 		}
 	}
 
