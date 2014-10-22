@@ -297,6 +297,7 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 
 		if (carForward) {
 
+			// Form a triangle to find out which point to rotate about
 			float z = 3.56f;
 			float x = 1000;
 			x = (float) -(4.64 / Math.tan(tireRotation));
@@ -304,18 +305,22 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 			Matrix carTransformation = new Matrix(4, 4);
 			carTransformation.loadIdentity();
 
+			// Put car in the origin
 			carTransformation.translate(carPosition.getX(), carPosition.getY(),
 					carPosition.getZ());
 			carTransformation.rotateY(carRotation);
 
+			// Rotate around the point
 			carTransformation.translate(x, 0, z);
 			carTransformation.rotateY(tireRotation * CAR_SPEED);
 			carTransformation.translate(-x, 0, -z);
 
+			// Undo transformations
 			carTransformation.rotateY(-carRotation);
 			carTransformation.translate(-carPosition.getX(),
 					-carPosition.getY(), -carPosition.getZ());
 
+			// Move car
 			carPosition = carTransformation.multiply(new Matrix(carPosition))
 					.toVector3f();
 			carRotation += tireRotation * CAR_SPEED;
@@ -376,8 +381,6 @@ public class SimpleScene extends GLCanvas implements GLEventListener,
 		case java.awt.event.KeyEvent.VK_B:
 			carBackward = true;
 			break;
-		case java.awt.event.KeyEvent.VK_C:
-			carRotation += 0.1f;
 		}
 	}
 
